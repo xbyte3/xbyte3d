@@ -80,7 +80,7 @@ if( first() ) {
         Objects # - objects table
         ) 
     ) # - Render and Scene initialize
-    # ATTENTION: if you edited the table of objects after initialization, then you will need to initialize the render again (render_init( table ( ... ) ))
+    # ATTENTION: if you edited the table of objects after initialization, then you will need to reinitialize (render_init( table ( ... ) ))
 }
 
 Render:graphics_update()
