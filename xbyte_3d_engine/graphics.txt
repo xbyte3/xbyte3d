@@ -1,0 +1,62 @@
+@persist Cache:array
+
+#include "xbyte_3d_engine/3dmath"
+
+function void wirelink:cl() {
+    This:egpClear()
+}
+
+function void wirelink:poly( I, [P1 P2 P3]:vector4, C:vector4 ) {
+    This:egpPoly( I, P1, P2, P3 )
+    This:egpColor( I, C )
+}
+
+function void wirelink:poly( I, [P1 P2 P3]:vector4, C:vector4, M:string ) {
+    This:egpPoly( I, P1, P2, P3 )
+    This:egpColor( I, C )
+    This:egpMaterial( I, M )
+}
+
+function void table:graphics_update() {
+    local Camera = This:camera()
+    local S = This:screen()
+    
+    foreach( O, Obj:table = This:objects() ) {
+        Obj["RotatedLocal", array] = array()
+        Obj["Translated", array] = array()
+        
+        local LocalPos = Camera:pos() - Obj:obj_pos()
+        
+        foreach( I, V:vector = Obj:obj_vertices() ) {
+            local Rotated = V:rotate( Obj:obj_ang() )
+
+            Obj["RotatedLocal", array]:pushVector( Rotated )
+            Obj["Translated", array]:pushVector2( Camera:toScreen( Obj:obj_pos() + Rotated ) )
+        }
+        
+        foreach( I, V:vector = Obj:obj_quads() ) {
+            local Vtx1 = Obj:obj_rl()[V:x(), vector]
+            local Vtx2 = Obj:obj_rl()[V:y(), vector]
+            local Vtx3 = Obj:obj_rl()[V:z(), vector]
+            
+            local Normal = ( Vtx2 - Vtx1 ):cross( Vtx3 - Vtx1 ):normalized()
+            local Shading = Normal:dot( ( LocalPos - ( Vtx1 + Vtx3 ) / 2 ):normalized() )
+                
+            local Index = Obj:obj_index() + I
+            
+            if( Shading > 0 ) {
+                Cache[Index, normal] = 1
+                
+                S:poly(Index, vec4( Obj:obj_tr()[V:x(), vector2], 0, 0),
+                            vec4( Obj:obj_tr()[V:y(), vector2], 0, 1),
+                            vec4( Obj:obj_tr()[V:z(), vector2], 1, 1),
+                            vec4( sqrt( Shading ) * 255 ) )
+            }
+            elseif( Cache[Index, normal] ) {
+                S:egpPoly( Index, vec2(), vec2(), vec2())
+                
+                Cache[Index, normal] = 0
+            }
+        }
+    }
+}

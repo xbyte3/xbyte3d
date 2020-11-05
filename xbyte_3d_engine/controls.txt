@@ -1,0 +1,58 @@
+
+#include "xbyte_3d_engine/3dmath"
+
+function vector2 table:controls_movement( Memory ) {
+    local Yaw = This:angles():yaw()
+    
+    switch( Memory ) {
+        case 119,
+            return -get_forward( Yaw ) / 5
+        break
+        
+        case 115,
+            return get_forward( Yaw ) / 5
+        break
+        
+        case 97,
+            return get_forward( Yaw - 90 ) / 5
+        break
+        
+        case 100,
+            return -get_forward( Yaw - 90 ) / 5
+        break
+    }
+    
+    return vec2()
+}
+
+function angle table:controls_eye( Memory, Scale ) {
+    local CameraAngles = This:angles()
+    
+    switch( Memory ) {
+        case 20,
+            return ang( 0, -Scale, 0 ):normalized()
+        break
+        
+        case 19,
+            return ang( 0, Scale, 0 ):normalized()
+        break
+        
+        case 17,
+            return ang( -Scale, 0, 0 ):normalized()
+        break
+        
+        case 18,
+            return ang( Scale, 0, 0 ):normalized()
+        break
+    }
+    
+    return ang()
+}
+
+function void table:controls( Memory ) {
+    if( !Memory ) { return }
+    
+    This["cp", vector] = This:pos() + vec( This:controls_movement( Memory ), 0 )
+    This["ca", angle] = This:angles() + This:controls_eye( Memory, 5 )
+    This["ca", angle] = ang( clamp( This:angles():pitch(), -90, 90 ), This:angles():yaw(), This:angles():roll() )
+}

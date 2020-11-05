@@ -1,0 +1,41 @@
+@persist Objects:table Render:table
+
+#include "xbyte_3d_engine/graphics"
+#include "xbyte_3d_engine/controls"
+
+function void render_init( This:table ) {
+    local IndexCount = 0
+    
+    foreach( I:string, Obj:table = This[6, table] ) { 
+        Obj["Index", number] = IndexCount
+        IndexCount += Obj["Quads", array]:count()
+    }
+    
+    Render["screen", wirelink] = This[1, wirelink]
+    Render["camera", table] = table( "cp" = This[2, vector], "ca" = This[3, angle], "fov" = This[4, number], "res" = This[5, vector2] )
+    Render["objects", table] = This[6, table]
+}
+
+function wirelink render_screen() { return Render["screen", wirelink] } # - get EGP
+function table render_objects() { return Render["objects", table] } # - get objects
+function table render_camera() { return Render["camera", table] } # - get camera
+
+function vector camera_pos() { return render_camera()["cp", vector] } # - get camera position
+function angle camera_ang() { return render_camera()["ca", angle] } # - get camera angles
+function number camera_fov() { return render_camera()["fov", number] } # - get camera fov
+function vector2 camera_res() { return render_camera()["res", vector2] } # - get camera resolution
+
+function table obj_get( Name:string ) { return render_objects()[Name, table] } # - get object by name
+
+function void scene_init() {
+    foreach( O, Obj:table = render_objects()) {
+        for( I = 1, Obj:obj_quads():count() ) {
+            render_screen():poly( Obj:obj_index() + I, vec4(), vec4(), vec4(), vec4( 255 ), Obj:obj_uv()[I, string] )
+        }
+    }
+}
+
+function void initialize( This:table ) {
+    render_init( This )
+    scene_init()
+}
