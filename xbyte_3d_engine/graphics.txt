@@ -35,6 +35,8 @@ function void table:graphics_update() {
     local Viewport = This:viewport() # - Viewport matrix4
     local Project = This:projection() # - Projection matrix4
     
+    local CameraEye = Ang:get_eye()
+    
     foreach( O, Obj:table = This:objects() ) {
         Obj["RotatedLocal", array] = array()
         Obj["Translated", array] = array()
@@ -54,7 +56,7 @@ function void table:graphics_update() {
             local Position = Viewport * vec4( NDC, 1 )
             
             Obj["RotatedLocal", array]:pushVector( NDC )
-            Obj["Translated", array]:pushVector2( vec2( Position ) )
+            Obj["Translated", array]:pushVector( vec( Position:x(), Position:y(), Clip:w() ) )
             
         }
         
@@ -64,17 +66,25 @@ function void table:graphics_update() {
             local Vtx2 = Obj:obj_rl()[V:y(), vector]
             local Vtx3 = Obj:obj_rl()[V:z(), vector]
             
+            local Vx = Obj:obj_tr()[V:x(), vector]
+            local Vy = Obj:obj_tr()[V:y(), vector]
+            local Vz = Obj:obj_tr()[V:z(), vector]
+            
             local Normal = ( Vtx2 - Vtx1 ):cross( Vtx3 - Vtx1 ):normalized()
             local Shading = Normal:dot( ( LocalPos - ( Vtx1 + Vtx3 ) / 2 ):normalized() )
                 
             local Index = Obj:obj_index() + I
             
+            if( Vx:z() > 0 ) { Shading = 0 }
+            if( Vy:z() > 0 ) { Shading = 0 }
+            if( Vz:z() > 0 ) { Shading = 0 }
+            
             if( Shading > 0 ) {
                 Cache[Index, normal] = 1
-                
-                S:poly(Index, vec4( Obj:obj_tr()[V:x(), vector2], 0, 0),
-                            vec4( Obj:obj_tr()[V:y(), vector2], 0, 1),
-                            vec4( Obj:obj_tr()[V:z(), vector2], 1, 1),
+
+                S:poly(Index, vec4( Vx:x(), Vx:y(), 0, 0),
+                            vec4( Vy:x(), Vy:y(), 0, 1),
+                            vec4( Vz:x(), Vz:y(), 1, 1),
                             vec4( sqrt( Shading ) * 255 ) )
             }
             elseif( Cache[Index, normal] ) {
