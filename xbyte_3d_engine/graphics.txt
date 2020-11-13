@@ -21,20 +21,45 @@ function void table:graphics_update() {
     local Camera = This:camera()
     local S = This:screen()
     
+    local Pos = Camera:pos()
+    Pos = vec( Pos:x(), Pos:z(), Pos:y() )
+    local Ang = Camera:angles():normalized()
+    
+    local Yaw = Ang:yaw()
+    local Pitch = Ang:pitch()
+    local Front = vec( cos( Yaw ) * cos( Pitch ), sin( Pitch ), sin( Yaw ) * cos( Pitch ) ):normalized() # - Center vector
+    
+    This:lookat( Pos, Pos + Front, vec( 0, 1, 0 ) ) # - Eye, Center, Up vectors
+    
+    local View = This:view() # - View matrix4
+    local Viewport = This:viewport() # - Viewport matrix4
+    local Project = This:projection() # - Projection matrix4
+    
     foreach( O, Obj:table = This:objects() ) {
         Obj["RotatedLocal", array] = array()
         Obj["Translated", array] = array()
         
-        local LocalPos = Camera:pos() - Obj:obj_pos()
+        local Model = identity4()
+        
+        Model = Model * Model:scale( Obj:obj_scale() ) # - Scaling object
+        Model = Model:translate( Obj:obj_pos() ) # - Moving object
+        
+        local LocalPos = ( Pos - Obj:obj_pos() ):normalized() # - For shading
         
         foreach( I, V:vector = Obj:obj_vertices() ) {
-            local Rotated = V:rotate( Obj:obj_ang() )
-
-            Obj["RotatedLocal", array]:pushVector( Rotated )
-            Obj["Translated", array]:pushVector2( Camera:toScreen( Obj:obj_pos() + Rotated ) )
+            V = V:rotate( Obj:obj_ang() )
+            
+            local Clip = Project * View * Model * vec4( V, 1 )
+            local NDC = vec( Clip ) / Clip:w()
+            local Position = Viewport * vec4( NDC, 1 )
+            
+            Obj["RotatedLocal", array]:pushVector( NDC )
+            Obj["Translated", array]:pushVector2( vec2( Position ) )
+            
         }
         
-        foreach( I, V:vector = Obj:obj_quads() ) {
+        foreach( I:number, V:vector = Obj:obj_tri() ) {
+            
             local Vtx1 = Obj:obj_rl()[V:x(), vector]
             local Vtx2 = Obj:obj_rl()[V:y(), vector]
             local Vtx3 = Obj:obj_rl()[V:z(), vector]

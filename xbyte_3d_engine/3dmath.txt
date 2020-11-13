@@ -12,30 +12,94 @@ function vector angle:get_eye() {
     return vec( VX, VY, VZ ):normalized()
 }
 
-function vector2 table:toScreen( Vec:vector ) {
-    local CameraPos = This:pos()
-    local CameraAngles = This:angles()
-    local FOV = This:fov()
-    local ScrSize = This:res()
-    
-    local Dir = -( Vec - CameraPos ):normalized()
-    local Local = toLocal( Vec, ang(), CameraPos, CameraAngles )
-    local Projected = vec2( Local:y(), Local:z() ) / Local:x() * cot( FOV / 2 )
-    
-    local Translated = ScrSize / 2 - Projected * ScrSize:y() / 1.5
-    local FDP = CameraAngles:get_eye():dot( Dir )
-    
-    if( FDP > 0 ) {
-        return Translated
-    }else{
-        return ScrSize
-    }
-}
+function number vector:norm() { return sqrt( ( This:x() ^ 2 ) + ( This:y() ^ 2 ) + ( This:z() ^ 2 ) ) }
 
-function number number:normalize() {
+function number number:anormalize() {
     return ( ( ( ( This % 360 ) + 540 ) % 360 ) - 180)
 }
 
 function angle angle:normalized() {
-    return ang( This:pitch():normalize(), This:yaw():normalize(), This:roll():normalize() )
+    return ang( This:pitch():anormalize(), This:yaw():anormalize(), This:roll():anormalize() )
+}
+
+function matrix4 viewport( X, Y, W, H, Far, Near ) {
+    local M = matrix4( 
+    W / 2, 0, 0, X + W / 2, 
+    0, H / 2, 0, Y + H / 2,
+    0, 0, ( Far - Near ) / 2, 0,
+    0, 0, ( Near + Far ) / 2, 1 )
+    
+    return M
+}
+
+function matrix4 perspective( FOV, Aspect, ZNear, ZFar ) {
+    local Top = ZNear * tan( FOV / 2 )
+    local Bottom = -Top
+    local Right = Top * Aspect
+    local Left = -Right
+    
+    local P = matrix4(
+    ( 2 * ZNear ) / ( Right - Left ), 0, 0, 0,
+    0, ( 2 * ZNear ) / ( Top - Bottom ), 0, 0,
+    ( Right + Left ) / ( Right - Left ), ( Top + Bottom ) / ( Top - Bottom ), -( ( ZFar + ZNear ) / ( ZFar - ZNear ) ), -1,
+    0, 0, -( ( 2 * ZFar * ZNear ) / ( ZFar - ZNear ) ), 0
+    )
+    
+    return P
+}
+
+function table:lookat( [Eye Center Up]:vector ) {
+    local Z = ( Eye - Center ):normalized()
+    local X = Up:cross( Z ):normalized()
+    local Y = Z:cross( X ):normalized()
+    
+    local Minv = matrix4(
+    X:x(), X:y(), X:z(), 0,
+    Y:x(), Y:y(), Y:z(), 0,
+    Z:x(), Z:y(), Z:z(), 0,
+    0, 0, 0, 1
+    )
+    
+    local Tr = matrix4(
+    1, 0, 0, -Center:x(),
+    0, 1, 0, -Center:y(),
+    0, 0, 1, -Center:z(),
+    0, 0, 0, 1
+    )
+    
+    local View = Minv * Tr
+    
+    This["view", matrix4] = View
+}
+
+function matrix4 matrix4:translate( T:vector ) {
+    local Translated = This * matrix4(
+    1, 0, 0, T:x(),
+    0, 1, 0, T:y(),
+    0, 0, 1, T:z(),
+    0, 0, 0, 1
+    )
+    
+    return Translated
+}
+
+function matrix4 matrix4:rotate( A, X, Y, Z ) { # - Broken.
+    local M = matrix4(
+    ( 1 - cos( A ) ) * X * X + cos( A ), ( 1 - cos( A ) ) * X * Y + Z * sin( A ), ( 1 - cos( A ) ) * Z * X - Y * sin( A ), 0,
+    ( 1 - cos( A ) ) * X * Y - Z * sin( A ), ( 1 - cos( A ) ) * Y * Y + cos( A ), ( 1 - cos( A ) ) * Y * Z + X * sin( A ), 0,
+    ( 1 - cos( A ) ) * Z * X + Y * sin( A ), ( 1 - cos( A ) ) * Y * Z - X * sin( A ), ( 1 - cos( A ) ) * Z * Z + cos( A ), 0,
+    0,0,0,1
+    )
+    return M
+}
+
+function matrix4 matrix4:scale( S:vector ) {
+    local Scaled = This * matrix4(
+    S:x(), 0, 0, 0,
+    0, S:y(), 0, 0,
+    0, 0, S:z(), 0,
+    0, 0, 0, 1
+    )
+    
+    return Scaled
 }
