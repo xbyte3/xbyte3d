@@ -6,8 +6,7 @@ function vector table:controls_movement( Memory ) {
     
     switch( Memory ) {
         case 119,
-            local D = -get_forward( Yaw ) / 5
-            return vec( D:x(), D:y(), 0 )
+            return vec( -get_forward( Yaw ) / 5 )
         break
         
         case 115,
