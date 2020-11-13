@@ -1,10 +1,11 @@
 
 function array table:obj_vertices() { return This["Vertices", array] } # - get object vertices
-function array table:obj_quads() { return This["Quads", array] } # - get object quads
-function table table:obj_uv() { return This["UV", table] } # - get object quads materials
+function array table:obj_tri() { return This["Triangles", array] } # - get object triangles
+function table table:obj_uv() { return This["UV", table] } # - get object triangles materials
 function number table:obj_index() { return This["Index", number] } # - get object start index
 function vector table:obj_pos() { return This["Pos", vector] } # - get object position
 function angle table:obj_ang() { return This["Ang", angle] } # - get object angles
+function vector table:obj_scale() { return This["Scale", vector] }
 function array table:obj_rl() { return This["RotatedLocal", array] } # - get object rotatedlocals
 function array table:obj_tr() { return This["Translated", array] } # - get object translated
 
@@ -16,3 +17,9 @@ function vector table:pos() { return This["cp", vector] } # - get camera positio
 function angle table:angles() { return This["ca", angle] } # - get camera angles
 function number table:fov() { return This["fov", number] } # - get camera fov
 function vector2 table:res() { return This["res", vector2] } # - get camera resolution
+function number table:znear() { return This["znear", number] } # - get camera znear
+function number table:zfar() { return This["zfar", number] } # - get camera zfar
+
+function matrix4 table:view() { return This["view", matrix4] } # - get view matrix
+function matrix4 table:viewport() { return This["viewport", matrix4] } # - get viewport matrix
+function matrix4 table:projection() { return This["project", matrix4] } # - get projection matrix

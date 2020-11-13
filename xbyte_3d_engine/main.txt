@@ -3,17 +3,21 @@
 #include "xbyte_3d_engine/graphics"
 #include "xbyte_3d_engine/controls"
 
-function void render_init( This:table ) {
-    local IndexCount = 0
+function void render_init( T:table ) {
+    local TriangleCount = 0
     
-    foreach( I:string, Obj:table = This[6, table] ) { 
-        Obj["Index", number] = IndexCount
-        IndexCount += Obj["Quads", array]:count()
+    foreach( I:string, Obj:table = T[8, table] ) { 
+        Obj["Index", number] = TriangleCount
+        TriangleCount += Obj["Triangles", array]:count()
     }
     
-    Render["screen", wirelink] = This[1, wirelink]
-    Render["camera", table] = table( "cp" = This[2, vector], "ca" = This[3, angle], "fov" = This[4, number], "res" = This[5, vector2] )
-    Render["objects", table] = This[6, table]
+    Render["screen", wirelink] = T[1, wirelink]
+    Render["camera", table] = table( "cp" = T[2, vector], "ca" = T[3, angle], "fov" = T[4, number], "znear" = T[5, number], "zfar" = T[6, number], "res" = T[7, vector2] )
+    Render["objects", table] = T[8, table]
+    
+    Render["view", matrix4] = identity4(), # - building an empty view matrix4
+    Render["viewport", matrix4] = viewport( 0, 0, T[7, vector2]:x(), T[7, vector2]:y(), 0, 1 ), # - building viewport matrix4
+    Render["project", matrix4] = perspective( T[4, number], T[7, vector2]:x() / T[7, vector2]:y(), T[5, number], T[6, number] ) # - building perspective projection matrix4
 }
 
 function wirelink render_screen() { return Render["screen", wirelink] } # - get EGP
@@ -23,13 +27,15 @@ function table render_camera() { return Render["camera", table] } # - get camera
 function vector camera_pos() { return render_camera()["cp", vector] } # - get camera position
 function angle camera_ang() { return render_camera()["ca", angle] } # - get camera angles
 function number camera_fov() { return render_camera()["fov", number] } # - get camera fov
+function vector2 camera_znear() { return render_camera()["znear", vector2] } # - get camera znear
+function vector2 camera_zfar() { return render_camera()["zfar", vector2] } # - get camera zfar
 function vector2 camera_res() { return render_camera()["res", vector2] } # - get camera resolution
 
 function table obj_get( Name:string ) { return render_objects()[Name, table] } # - get object by name
 
 function void scene_init() {
     foreach( O, Obj:table = render_objects()) {
-        for( I = 1, Obj:obj_quads():count() ) {
+        for( I = 1, Obj:obj_tri():count() ) {
             render_screen():poly( Obj:obj_index() + I, vec4(), vec4(), vec4(), vec4( 255 ), Obj:obj_uv()[I, string] )
         }
     }
@@ -39,3 +45,4 @@ function void initialize( This:table ) {
     render_init( This )
     scene_init()
 }
+
