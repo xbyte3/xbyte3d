@@ -13,23 +13,6 @@ if( first() ) {
     # - Initizalizing objects table
     
     Objects = table(
-#[    "grass"=table(
-        "Vertices" = array(
-        vec(-2, -2, 1),
-        vec(-2, 2, 1),
-        vec(2, 2, 1),
-        vec(2, -2, 1)
-        ),
-        "Quads" = array(
-        vec(1, 2, 3),
-        vec(3, 4, 1)
-        ),
-        "Index"=16,
-        "ObjPos"=vec( 0, 0, 0 ),
-        "ObjAngles"=ang(),
-        "RotatedLocal"=array(),
-        "Translated"=array()
-    ),]#
     "cube"=table(
         "Vertices" = array( # - object vertices
         vec(-0.25, -0.25, -0.25),
@@ -42,18 +25,18 @@ if( first() ) {
         vec(0.25, 0.25, 0.25),
         vec(0.25, -0.25, 0.25)),
         
-        "Quads" = array( # - object quads
+        "Triangles" = array( # - object triangles
         vec(1, 2, 3),
         vec(3, 4, 1),
         
         vec(8, 7, 6),
         vec(6, 5, 8),
         
-        vec(5, 6, 2),
-        vec(2, 1, 5),
-        
         vec(7, 8, 4),
         vec(4, 3, 7),
+        
+        vec(5, 6, 2),
+        vec(2, 1, 5),
         
         vec(6, 7, 3),
         vec(3, 2, 6),
@@ -61,27 +44,30 @@ if( first() ) {
         vec(1, 4, 8),
         vec(8, 5, 1)
         ),
-        "UV" = table(), # - quad index = material
-        "Pos"=vec( -2, 0, 0 ), # - object position
-        "Ang"=ang(), # - object angle
-        "RotatedLocal"=array(), # - object array
-        "Translated"=array() # - object array
+        "UV" = table(), # - triangle index = material
+        "Pos" = vec( 0, 0, 0 ), # - object position
+        "Ang" = ang( 55, 0, 55 ), # - object angles
+        "Scale" = vec( 1 ), # - object scale
+        "RotatedLocal" = array(), # - for shading
+        "Translated" = array() # - for drawing
         )
     )
     
-    foreach( I, Obj:table = Objects ) { for( O = 1, Obj:obj_quads():count() ) { Obj["UV", table][O, string] = "vgui/resource/icon_steam" } } # - setting up objects quads materials
+    foreach( I, Obj:table = Objects ) { for( O = 1, Obj:obj_tri():count() ) { Obj["UV", table][O, string] = "vgui/resource/icon_steam" } } # - setting up objects triangles material
     
     initialize( table( 
         S, # - egp screen
-        vec(), # - camera position
-        ang(), # - camera angles
-        93.32, # - camera fov
+        vec( 0, 4, 0 ), # - camera position
+        ang( 0, 90, 0 ), # - camera angles
+        90, # - camera fov
+        0.1, # - znear
+        10, # - zfar
         vec2( 512 ), # - camera resolution
         Objects # - objects table
         ) 
     ) # - Render and Scene initialize
-    # ATTENTION: if you edited the table of objects after initialization, then you will need to initialize the render again (render_init( table ( ... ) ))
+    # ATTENTION: if you edited the table of objects after initialization, then you will need just use <Render["Objects", table] = Objects>
+    Render:graphics_update()
 }
-
 Render:graphics_update()
 Render:camera():controls( Memory )
