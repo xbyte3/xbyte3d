@@ -41,16 +41,22 @@ function void table:graphics_update() {
         Obj["RotatedLocal", array] = array()
         Obj["Translated", array] = array()
         
+        local Ang = Obj:obj_ang():normalized()
+        local Pos = Obj:obj_pos()
+        Pos = vec( Pos:x(), Pos:z(), Pos:y() )
         local Model = identity4()
         
-        Model = Model * Model:scale( Obj:obj_scale() ) # - Scaling object
-        Model = Model:translate( Obj:obj_pos() ) # - Moving object
+        Model = Model:translate( Pos ) # - Moving object
+        
+        Model = Model:rotate( Ang:roll(), 0, 0, 1 )
+        Model = Model:rotate( Ang:pitch(), 1, 0, 0 )
+        Model = Model:rotate( Ang:yaw(), 0, 1, 0 )
+        
+        Model = Model:scale( Obj:obj_scale() ) # - Scaling object
         
         local LocalPos = ( Pos - Obj:obj_pos() ):normalized() # - For shading
         
-        foreach( I, V:vector = Obj:obj_vertices() ) {
-            V = V:rotate( Obj:obj_ang() )
-            
+        foreach( I, V:vector = Obj:obj_vertices() ) { 
             local Clip = Project * View * Model * vec4( V, 1 )
             local NDC = vec( Clip ) / Clip:w()
             local Position = Viewport * vec4( NDC, 1 )

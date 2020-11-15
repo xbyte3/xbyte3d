@@ -84,7 +84,7 @@ function matrix4 matrix4:translate( T:vector ) {
 }
 
 function matrix4 matrix4:rotate( A, X, Y, Z ) { # - Broken.
-    local M = matrix4(
+    local M = This * matrix4(
     ( 1 - cos( A ) ) * X * X + cos( A ), ( 1 - cos( A ) ) * X * Y + Z * sin( A ), ( 1 - cos( A ) ) * Z * X - Y * sin( A ), 0,
     ( 1 - cos( A ) ) * X * Y - Z * sin( A ), ( 1 - cos( A ) ) * Y * Y + cos( A ), ( 1 - cos( A ) ) * Y * Z + X * sin( A ), 0,
     ( 1 - cos( A ) ) * Z * X + Y * sin( A ), ( 1 - cos( A ) ) * Y * Z - X * sin( A ), ( 1 - cos( A ) ) * Z * Z + cos( A ), 0,
