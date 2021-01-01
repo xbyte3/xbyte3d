@@ -6,7 +6,7 @@
 function void render_init( T:table ) {
     local TriangleCount = 0
     
-    foreach( I:string, Obj:table = T[8, table] ) { 
+    foreach( I:number, Obj:table = T[8, table] ) {
         Obj["Index", number] = TriangleCount
         TriangleCount += Obj["Triangles", array]:count()
     }
@@ -18,6 +18,8 @@ function void render_init( T:table ) {
     Render["view", matrix4] = identity4(), # - building an empty view matrix4
     Render["viewport", matrix4] = viewport( 0, 0, T[7, vector2]:x(), T[7, vector2]:y(), 0, 1 ), # - building viewport matrix4
     Render["project", matrix4] = perspective( T[4, number], T[7, vector2]:x() / T[7, vector2]:y(), T[5, number], T[6, number] ) # - building perspective projection matrix4
+    
+    Render["debugmode", number] = T[9, number]
 }
 
 function wirelink render_screen() { return Render["screen", wirelink] } # - get EGP
@@ -34,10 +36,18 @@ function vector2 camera_res() { return render_camera()["res", vector2] } # - get
 function table obj_get( Name:string ) { return render_objects()[Name, table] } # - get object by name
 
 function void scene_init() {
-    foreach( O, Obj:table = render_objects()) {
-        for( I = 1, Obj:obj_tri():count() ) {
-            render_screen():poly( Obj:obj_index() + I, vec4(), vec4(), vec4(), vec4( 255 ), Obj:obj_uv()[I, string] )
-        }
+    if( Render["debugmode", number] ) {
+        local Res = camera_res()
+        
+        render_screen():text( 297, "pos: " + floor( camera_pos():x(), 2 ) + " " + floor( camera_pos():y(), 2 ) + " " + floor( camera_pos():z(), 2 ), 10, "Tahoma", vec2( Res:x() - 96, 6 ), vec4( 255 ) )
+        render_screen():text( 298, "ang: " + camera_ang():pitch() + " " + camera_ang():yaw() + " " + camera_ang():roll(), 10, "Tahoma", vec2( Res:x() - 96, 14 ), vec4( 255 ) )
+        render_screen():text( 299, "triangles: nan", 10, "Tahoma", vec2( Res:x() - 96, 22 ), vec4( 255 ) )
+        render_screen():text( 300, "visible triangles: nan" , 10, "Tahoma", vec2( Res:x() - 96, 30 ), vec4( 255 ) )
+        
+        render_screen():egpAlign( 297, 0, 1 )
+        render_screen():egpAlign( 298, 0, 1 )
+        render_screen():egpAlign( 299, 0, 1 )
+        render_screen():egpAlign( 300, 0, 1 )
     }
 }
 

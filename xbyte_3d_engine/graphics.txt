@@ -6,23 +6,24 @@ function void wirelink:cl() {
     This:egpClear()
 }
 
-function void wirelink:poly( I, [P1 P2 P3]:vector4, C:vector4 ) {
-    This:egpPoly( I, P1, P2, P3 )
-    This:egpColor( I, C )
-}
-
 function void wirelink:poly( I, [P1 P2 P3]:vector4, C:vector4, M:string ) {
     This:egpPoly( I, P1, P2, P3 )
     This:egpColor( I, C )
     This:egpMaterial( I, M )
 }
 
+function wirelink:text( I, Text:string, Size, Font:string, Vec:vector2, C:vector4 ) {
+    This:egpText( I, Text ,Vec )
+    This:egpColor( I, C )
+    This:egpAlign( I, 1, 1 )
+    This:egpFont( I, Font, Size )
+}
+
 function void table:graphics_update() {
     local Camera = This:camera()
     local S = This:screen()
     
-    local Pos = Camera:pos()
-    Pos = vec( Pos:x(), Pos:z(), Pos:y() )
+    local Pos = Camera:pos():invert()
     local Ang = Camera:angles():normalized()
     
     local Yaw = Ang:yaw()
@@ -35,28 +36,29 @@ function void table:graphics_update() {
     local Viewport = This:viewport() # - Viewport matrix4
     local Project = This:projection() # - Projection matrix4
     
-    local CameraEye = Ang:get_eye()
+    local Triangles = 0
+    local VisibleTriangles = 0
     
-    foreach( O, Obj:table = This:objects() ) {
+    foreach( O:number, Obj:table = This:objects() ) {
         Obj["RotatedLocal", array] = array()
         Obj["Translated", array] = array()
         
         local Ang = Obj:obj_ang():normalized()
-        local Pos = Obj:obj_pos()
-        Pos = vec( Pos:x(), Pos:z(), Pos:y() )
+        local PosObj = Obj:obj_pos():invert()
+        
         local Model = identity4()
         
-        Model = Model:translate( Pos ) # - Moving object
+        Model = Model:translate( PosObj ) # - Moving object
         
         Model = Model:rotate( Ang:roll(), 0, 0, 1 )
         Model = Model:rotate( Ang:pitch(), 1, 0, 0 )
         Model = Model:rotate( Ang:yaw(), 0, 1, 0 )
-        
-        Model = Model:scale( Obj:obj_scale() ) # - Scaling object
+    
+        Model = Model:scale( Obj:obj_scale() )
         
         local LocalPos = ( Pos - Obj:obj_pos() ):normalized() # - For shading
         
-        foreach( I, V:vector = Obj:obj_vertices() ) { 
+        foreach( I:number, V:vector = Obj:obj_vertices() ) { 
             local Clip = Project * View * Model * vec4( V, 1 )
             local NDC = vec( Clip ) / Clip:w()
             local Position = Viewport * vec4( NDC, 1 )
@@ -87,17 +89,28 @@ function void table:graphics_update() {
             
             if( Shading > 0 ) {
                 Cache[Index, normal] = 1
-
-                S:poly(Index, vec4( Vx:x(), Vx:y(), 0, 0),
-                            vec4( Vy:x(), Vy:y(), 0, 1),
-                            vec4( Vz:x(), Vz:y(), 1, 1),
-                            vec4( sqrt( Shading ) * 255 ) )
+                
+                S:poly( Index, vec4( Vx:x(), Vx:y(), 0, 0 ),
+                            vec4( Vy:x(), Vy:y(), 0, 1 ),
+                            vec4( Vz:x(), Vz:y(), 1, 1 ),
+                            vec4( vec( sqrt( Shading ) * 255 ), 255 ),
+                            Obj:obj_uv()[I, string] )
+                VisibleTriangles++
             }
             elseif( Cache[Index, normal] ) {
-                S:egpPoly( Index, vec2(), vec2(), vec2())
+                S:egpRemove( Index )
                 
                 Cache[Index, normal] = 0
             }
+            
+            Triangles++
         }
+    }
+    
+    if( This["debugmode", number] ) {
+        S:egpSetText( 297, "pos: " + floor( Pos:x(), 2 ) + " " + floor( Pos:z(), 2 ) + " " + floor( Pos:y(), 2 ) )
+        S:egpSetText( 298, "ang: " + Ang:pitch() + " " + Ang:yaw() + " " + Ang:roll() )
+        S:egpSetText( 299, "triangles: " + Triangles )
+        S:egpSetText( 300, "visible triangles: " + VisibleTriangles )
     }
 }
