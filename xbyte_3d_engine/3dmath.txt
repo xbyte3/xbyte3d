@@ -5,14 +5,16 @@ function vector2 get_forward( Yaw ) {
     return vec2( cos( Yaw ), sin( Yaw ) )
 }
 
+function vector vector:invert() {
+    return vec( This:x(), This:z(), This:y() )
+}
+
 function vector angle:get_eye() {
     local VX = cos( This:yaw() )
     local VY = sin( This:yaw() )
     local VZ = tan( -This:pitch() )
     return vec( VX, VY, VZ ):normalized()
 }
-
-function number vector:norm() { return sqrt( ( This:x() ^ 2 ) + ( This:y() ^ 2 ) + ( This:z() ^ 2 ) ) }
 
 function number number:anormalize() {
     return ( ( ( ( This % 360 ) + 540 ) % 360 ) - 180)
@@ -83,13 +85,14 @@ function matrix4 matrix4:translate( T:vector ) {
     return Translated
 }
 
-function matrix4 matrix4:rotate( A, X, Y, Z ) { # - Broken.
+function matrix4 matrix4:rotate( A, X, Y, Z ) {
     local M = This * matrix4(
     ( 1 - cos( A ) ) * X * X + cos( A ), ( 1 - cos( A ) ) * X * Y + Z * sin( A ), ( 1 - cos( A ) ) * Z * X - Y * sin( A ), 0,
     ( 1 - cos( A ) ) * X * Y - Z * sin( A ), ( 1 - cos( A ) ) * Y * Y + cos( A ), ( 1 - cos( A ) ) * Y * Z + X * sin( A ), 0,
     ( 1 - cos( A ) ) * Z * X + Y * sin( A ), ( 1 - cos( A ) ) * Y * Z - X * sin( A ), ( 1 - cos( A ) ) * Z * Z + cos( A ), 0,
-    0,0,0,1
+    0, 0, 0 ,1
     )
+    
     return M
 }
 
