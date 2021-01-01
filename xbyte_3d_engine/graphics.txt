@@ -50,11 +50,11 @@ function void table:graphics_update() {
         
         Model = Model:translate( PosObj ) # - Moving object
         
-        Model = Model:rotate( Ang:roll(), 0, 0, 1 )
-        Model = Model:rotate( Ang:pitch(), 1, 0, 0 )
-        Model = Model:rotate( Ang:yaw(), 0, 1, 0 )
+        Model = Model:rotate( Ang:roll(), 0, 0, 1 ) # - Rotating object
+        Model = Model:rotate( Ang:pitch(), 1, 0, 0 ) # - Rotating object
+        Model = Model:rotate( Ang:yaw(), 0, 1, 0 ) # - Rotating object
     
-        Model = Model:scale( Obj:obj_scale() )
+        Model = Model:scale( Obj:obj_scale() ) # - Scaling object
         
         local LocalPos = ( Pos - Obj:obj_pos() ):normalized() # - For shading
         
