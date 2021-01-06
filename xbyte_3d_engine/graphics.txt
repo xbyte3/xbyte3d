@@ -30,7 +30,7 @@ function void table:graphics_update() {
     local Pitch = Ang:pitch()
     local Front = vec( cos( Yaw ) * cos( Pitch ), sin( Pitch ), sin( Yaw ) * cos( Pitch ) ):normalized() # - Center vector
     
-    This:lookat( Pos, Pos + Front, vec( 0, 1, 0 ) ) # - Eye, Center, Up vectors
+    This["view", matrix4] = lookat( Pos, Pos + Front, vec( 0, 1, 0 ) ) # - Eye, Center, Up vectors
     
     local View = This:view() # - View matrix4
     local Viewport = This:viewport() # - Viewport matrix4

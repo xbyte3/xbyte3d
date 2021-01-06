@@ -50,7 +50,7 @@ function matrix4 perspective( FOV, Aspect, ZNear, ZFar ) {
     return P
 }
 
-function table:lookat( [Eye Center Up]:vector ) {
+function matrix4 lookat( [Eye Center Up]:vector ) {
     local Z = ( Eye - Center ):normalized()
     local X = Up:cross( Z ):normalized()
     local Y = Z:cross( X ):normalized()
@@ -69,9 +69,7 @@ function table:lookat( [Eye Center Up]:vector ) {
     0, 0, 0, 1
     )
     
-    local View = Minv * Tr
-    
-    This["view", matrix4] = View
+    return Minv * Tr
 }
 
 function matrix4 matrix4:translate( T:vector ) {
