@@ -10,10 +10,7 @@ function vector vector:invert() {
 }
 
 function vector angle:get_eye() {
-    local VX = cos( This:yaw() )
-    local VY = sin( This:yaw() )
-    local VZ = tan( -This:pitch() )
-    return vec( VX, VY, VZ ):normalized()
+    return vec( cos( This:yaw() ), sin( This:yaw() ), tan( -This:pitch() ) ):normalized()
 }
 
 function number number:anormalize() {
@@ -25,13 +22,11 @@ function angle angle:normalized() {
 }
 
 function matrix4 viewport( X, Y, W, H, Far, Near ) {
-    local M = matrix4( 
-    W / 2, 0, 0, X + W / 2, 
-    0, H / 2, 0, Y + H / 2,
-    0, 0, ( Far - Near ) / 2, 0,
-    0, 0, ( Near + Far ) / 2, 1 )
-    
-    return M
+    return matrix4( 
+        W / 2, 0, 0, X + W / 2, 
+        0, H / 2, 0, Y + H / 2,
+        0, 0, ( Far - Near ) / 2, 0,
+        0, 0, ( Near + Far ) / 2, 1 )
 }
 
 function matrix4 perspective( FOV, Aspect, ZNear, ZFar ) {
@@ -55,52 +50,42 @@ function matrix4 lookat( [Eye Center Up]:vector ) {
     local X = Up:cross( Z ):normalized()
     local Y = Z:cross( X ):normalized()
     
-    local Minv = matrix4(
-    X:x(), X:y(), X:z(), 0,
-    Y:x(), Y:y(), Y:z(), 0,
-    Z:x(), Z:y(), Z:z(), 0,
-    0, 0, 0, 1
-    )
-    
-    local Tr = matrix4(
-    1, 0, 0, -Center:x(),
-    0, 1, 0, -Center:y(),
-    0, 0, 1, -Center:z(),
-    0, 0, 0, 1
-    )
-    
-    return Minv * Tr
+    return matrix4(
+        X:x(), X:y(), X:z(), 0,
+        Y:x(), Y:y(), Y:z(), 0,
+        Z:x(), Z:y(), Z:z(), 0,
+        0, 0, 0, 1
+        ) * matrix4(
+            1, 0, 0, -Center:x(),
+            0, 1, 0, -Center:y(),
+            0, 0, 1, -Center:z(),
+            0, 0, 0, 1
+            )
 }
 
-function matrix4 matrix4:translate( T:vector ) {
-    local Translated = This * matrix4(
-    1, 0, 0, T:x(),
-    0, 1, 0, T:y(),
-    0, 0, 1, T:z(),
-    0, 0, 0, 1
-    )
-    
-    return Translated
+function matrix4 matrix4:translate( T:vector ) { 
+    return This * matrix4(
+        1, 0, 0, T:x(),
+        0, 1, 0, T:y(),
+        0, 0, 1, T:z(),
+        0, 0, 0, 1
+        )
 }
 
 function matrix4 matrix4:rotate( A, X, Y, Z ) {
-    local M = This * matrix4(
-    ( 1 - cos( A ) ) * X * X + cos( A ), ( 1 - cos( A ) ) * X * Y + Z * sin( A ), ( 1 - cos( A ) ) * Z * X - Y * sin( A ), 0,
-    ( 1 - cos( A ) ) * X * Y - Z * sin( A ), ( 1 - cos( A ) ) * Y * Y + cos( A ), ( 1 - cos( A ) ) * Y * Z + X * sin( A ), 0,
-    ( 1 - cos( A ) ) * Z * X + Y * sin( A ), ( 1 - cos( A ) ) * Y * Z - X * sin( A ), ( 1 - cos( A ) ) * Z * Z + cos( A ), 0,
-    0, 0, 0 ,1
-    )
-    
-    return M
+    return This * matrix4(
+        ( 1 - cos( A ) ) * X * X + cos( A ), ( 1 - cos( A ) ) * X * Y + Z * sin( A ), ( 1 - cos( A ) ) * Z * X - Y * sin( A ), 0,
+        ( 1 - cos( A ) ) * X * Y - Z * sin( A ), ( 1 - cos( A ) ) * Y * Y + cos( A ), ( 1 - cos( A ) ) * Y * Z + X * sin( A ), 0,
+        ( 1 - cos( A ) ) * Z * X + Y * sin( A ), ( 1 - cos( A ) ) * Y * Z - X * sin( A ), ( 1 - cos( A ) ) * Z * Z + cos( A ), 0,
+        0, 0, 0 ,1
+        )
 }
 
-function matrix4 matrix4:scale( S:vector ) {
-    local Scaled = This * matrix4(
-    S:x(), 0, 0, 0,
-    0, S:y(), 0, 0,
-    0, 0, S:z(), 0,
-    0, 0, 0, 1
-    )
-    
-    return Scaled
+function matrix4 matrix4:scale( S:vector ) { 
+    return This * matrix4(
+        S:x(), 0, 0, 0,
+        0, S:y(), 0, 0,
+        0, 0, S:z(), 0,
+        0, 0, 0, 1
+        )
 }
