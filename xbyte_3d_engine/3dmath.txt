@@ -35,14 +35,12 @@ function matrix4 perspective( FOV, Aspect, ZNear, ZFar ) {
     local Right = Top * Aspect
     local Left = -Right
     
-    local P = matrix4(
-    ( 2 * ZNear ) / ( Right - Left ), 0, 0, 0,
-    0, ( 2 * ZNear ) / ( Top - Bottom ), 0, 0,
-    ( Right + Left ) / ( Right - Left ), ( Top + Bottom ) / ( Top - Bottom ), -( ( ZFar + ZNear ) / ( ZFar - ZNear ) ), -1,
-    0, 0, -( ( 2 * ZFar * ZNear ) / ( ZFar - ZNear ) ), 0
-    )
-    
-    return P
+    return matrix4(
+		( 2 * ZNear ) / ( Right - Left ), 0, 0, 0,
+		0, ( 2 * ZNear ) / ( Top - Bottom ), 0, 0,
+		( Right + Left ) / ( Right - Left ), ( Top + Bottom ) / ( Top - Bottom ), -( ( ZFar + ZNear ) / ( ZFar - ZNear ) ), -1,
+		0, 0, -( ( 2 * ZFar * ZNear ) / ( ZFar - ZNear ) ), 0
+		)
 }
 
 function matrix4 lookat( [Eye Center Up]:vector ) {
