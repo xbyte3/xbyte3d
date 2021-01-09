@@ -36,19 +36,16 @@ function void table:graphics_update() {
     local Viewport = This:viewport() # - Viewport matrix4
     local Project = This:projection() # - Projection matrix4
     
-    local Triangles = 0
-    local VisibleTriangles = 0
+    local Triangles = VisibleTriangles = 0
     
     foreach( O:number, Obj:table = This:objects() ) {
         Obj["RotatedLocal", array] = array()
         Obj["Translated", array] = array()
         
         local Ang = Obj:obj_ang():normalized()
-        local PosObj = Obj:obj_pos():invert()
-        
         local Model = identity4()
         
-        Model = Model:translate( PosObj ) # - Moving object
+        Model = Model:translate( Obj:obj_pos():invert() ) # - Moving object
         
         Model = Model:rotate( Ang:roll(), 0, 0, 1 ) # - Rotating object
         Model = Model:rotate( Ang:pitch(), 1, 0, 0 ) # - Rotating object
@@ -56,7 +53,7 @@ function void table:graphics_update() {
     
         Model = Model:scale( Obj:obj_scale() ) # - Scaling object
         
-        local LocalPos = ( Pos - Obj:obj_pos() ):normalized() # - For shading
+        local LocalPos = ( Pos - Obj:obj_pos():invert() ):normalized() # - For shading
         
         foreach( I:number, V:vector = Obj:obj_vertices() ) { 
             local Clip = Project * View * Model * vec4( V, 1 )
@@ -65,34 +62,25 @@ function void table:graphics_update() {
             
             Obj["RotatedLocal", array]:pushVector( NDC )
             Obj["Translated", array]:pushVector( vec( Position:x(), Position:y(), Clip:w() ) )
-            
         }
         
         foreach( I:number, V:vector = Obj:obj_tri() ) {
+            local Vtx = array( Obj:obj_rl()[V:x(), vector], Obj:obj_rl()[V:y(), vector], Obj:obj_rl()[V:z(), vector] )
+            local Vxyz = array( Obj:obj_tr()[V:x(), vector], Obj:obj_tr()[V:y(), vector], Obj:obj_tr()[V:z(), vector] )
             
-            local Vtx1 = Obj:obj_rl()[V:x(), vector]
-            local Vtx2 = Obj:obj_rl()[V:y(), vector]
-            local Vtx3 = Obj:obj_rl()[V:z(), vector]
+            local Normal = ( Vtx[2, vector] - Vtx[1, vector] ):cross( Vtx[3, vector] - Vtx[1, vector] ):normalized()
+            local Shading = Normal:dot( ( LocalPos - ( Vtx[1, vector] + Vtx[3, vector] ) / 2 ):normalized() )
             
-            local Vx = Obj:obj_tr()[V:x(), vector]
-            local Vy = Obj:obj_tr()[V:y(), vector]
-            local Vz = Obj:obj_tr()[V:z(), vector]
-            
-            local Normal = ( Vtx2 - Vtx1 ):cross( Vtx3 - Vtx1 ):normalized()
-            local Shading = Normal:dot( ( LocalPos - ( Vtx1 + Vtx3 ) / 2 ):normalized() )
-                
             local Index = Obj:obj_index() + I
-            
-            if( Vx:z() > 0 ) { Shading = 0 }
-            if( Vy:z() > 0 ) { Shading = 0 }
-            if( Vz:z() > 0 ) { Shading = 0 }
+			            
+			         Shading = Vxyz[1, vector]:z() > 0 | Vxyz[2, vector]:z() > 0 | Vxyz[3, vector]:z() < 0 ? Shading : 0
             
             if( Shading > 0 ) {
                 Cache[Index, normal] = 1
                 
-                S:poly( Index, vec4( Vx:x(), Vx:y(), 0, 0 ),
-                            vec4( Vy:x(), Vy:y(), 0, 1 ),
-                            vec4( Vz:x(), Vz:y(), 1, 1 ),
+                S:poly( Index, vec4( Vxyz[1, vector]:x(), Vxyz[1, vector]:y(), 0, 0 ),
+                            vec4( Vxyz[2, vector]:x(), Vxyz[2, vector]:y(), 0, 1 ),
+                            vec4( Vxyz[3, vector]:x(), Vxyz[3, vector]:y(), 1, 1 ),
                             vec4( vec( sqrt( Shading ) * 255 ), 255 ),
                             Obj:obj_uv()[I, string] )
                 VisibleTriangles++
