@@ -74,7 +74,7 @@ function void table:graphics_update() {
             
             local Index = Obj:obj_index() + I
 			            
-			         Shading = Vxyz[1, vector]:z() > 0 | Vxyz[2, vector]:z() > 0 | Vxyz[3, vector]:z() < 0 ? Shading : 0
+			         Shading = Vxyz[1, vector]:z() > 0 | Vxyz[2, vector]:z() > 0 | Vxyz[3, vector]:z() > 0 ? 0 : Shading
             
             if( Shading > 0 ) {
                 Cache[Index, normal] = 1
