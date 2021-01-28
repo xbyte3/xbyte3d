@@ -10,10 +10,10 @@ if( first() ) {
     S = entity():isWeldedTo():wirelink() # - egp screen
     S:cl() # - cleaning egp screen
     
-    # - Initizalizing objects table
+    # - Initizalizing table of objects
     
     Objects = table(
-#[    1 = table(
+#[      1 = table(
         "info" = "pyr",
         "Vertices" = array( # - object vertices
         vec(-0.25, -0.25, -0.25),
@@ -46,12 +46,12 @@ if( first() ) {
         vec(8, 5, 1)
         ),
         "UV" = table(), # - triangle index = material
-        "Pos" = vec( 0, -5, 0.6 ), # - object position
+        "Pos" = vec( 0, 2, 0 ), # - object position
         "Ang" = ang( 0, 0, 0 ), # - object angles
         "Scale" = vec( 1 ), # - object scale
         "RotatedLocal" = array(), # - for shading
         "Translated" = array() # - for drawing
-        ),]#
+        )]#
     2 = table(
         "info" = "cube", # - info about object
         "Vertices" = array( # - object vertices
@@ -97,11 +97,11 @@ if( first() ) {
     
     initialize( table( 
         S, # - egp screen
-        vec( 0, 4, 0 ), # - camera position
+        vec( 0, 16, 0 ), # - camera position
         ang( 0, 90, 0 ), # - camera angles
         90, # - camera fov
-        0.1, # - znear
-        10, # - zfar
+        0.03, # - znear
+        1000, # - zfar
         vec2( 512 ), # - camera resolution
         Objects, # - objects table
         1 # - Debug mode( Shows your pos, angles, triangles, visible triangles )

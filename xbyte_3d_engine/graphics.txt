@@ -51,7 +51,7 @@ function void table:graphics_update() {
         Model = Model:rotate( ObjAng:roll(), 0, 0, 1 ) # - Rotating object
         Model = Model:rotate( ObjAng:pitch(), 1, 0, 0 ) # - Rotating object
         Model = Model:rotate( ObjAng:yaw(), 0, 1, 0 ) # - Rotating object
-    
+        
         Model = Model:scale( Obj:obj_scale() ) # - Scaling object
         
         local LocalPos = ( Pos - ObjPos ):normalized() # - For shading
@@ -74,7 +74,7 @@ function void table:graphics_update() {
             
             local Index = Obj:obj_index() + I
 			            
-			         Shading = Vxyz[1, vector]:z() > 0 | Vxyz[2, vector]:z() > 0 | Vxyz[3, vector]:z() > 0 ? 0 : Shading
+			         Shading = ( Vxyz[1, vector]:z() > Camera:znear() | Vxyz[1, vector]:z() > Camera:zfar() ) | ( Vxyz[2, vector]:z() > Camera:znear() | Vxyz[2, vector]:z() > Camera:zfar() ) | ( Vxyz[3, vector]:z() > Camera:znear() | Vxyz[3, vector]:z() > Camera:zfar() ) ? 0 : Shading
             
             if( Shading > 0 ) {
                 Cache[Index, normal] = 1
