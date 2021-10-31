@@ -95,9 +95,7 @@ if( first() ) {
         ) 
     ) # - Render and Scene initialize
     
-    render_think( 100 ) # - set interval
-    
-    timer( "Think", render_think() )
+    timer( "Think", render_think() ) # - default 100
 }
 
 if ( clk( "Think" ) ) {
