@@ -1,10 +1,7 @@
 @name xbyte_3d_engine testExample
 @inputs Memory
-@persist S:wirelink 
-interval( 100 )
 
 if( first() ) {
-    
     #include "xbyte_3d_engine/main"
     
     S = entity():isWeldedTo():wirelink() # - egp screen
@@ -12,88 +9,78 @@ if( first() ) {
     
     # - Initizalizing table of objects
     
-    Objects = table(
-#[      1 = table(
-        "info" = "pyr",
-        "Vertices" = array( # - object vertices
-        vec(-0.25, -0.25, -0.25),
-        vec(-0.25, 0.25, -0.25),
-        vec(0.25, 0.25, -0.25),
-        vec(0.25, -0.25, -0.25),
-        
-        vec(-0.15, -0.15, 0.15),
-        vec(-0.15, 0.15, 0.15),
-        vec(0.15, 0.15, 0.15),
-        vec(0.15, -0.15, 0.15)),
-        
-        "Triangles" = array( # - object triangles
-        vec(1, 2, 3),
-        vec(3, 4, 1),
-        
-        vec(8, 7, 6), # - top 2
-        vec(6, 5, 8), # - top 1
-        
-        vec(7, 8, 4),
-        vec(4, 3, 7),
-        
-        vec(5, 6, 2),
-        vec(2, 1, 5),
-        
-        vec(6, 7, 3),
-        vec(3, 2, 6),
-        
-        vec(1, 4, 8),
-        vec(8, 5, 1)
+    Objects = table()
+    Objects:obj_tbl_set( 2, obj_init( table(
+        "desc" = "Pyramid",
+        "Vertices" = array(
+            vec( -0.25, -0.25, -0.25 ) ,
+            vec( -0.25, 0.25, -0.25 ),
+            vec( 0.25, 0.25, -0.25 ),
+            vec( 0.25, -0.25, -0.25 ),
+            
+            vec( -0.15, -0.15, 0.15 ),
+            vec( -0.15, 0.15, 0.15 ),
+            vec( 0.15, 0.15, 0.15 ),
+            vec( 0.15, -0.15, 0.15 )
         ),
-        "UV" = table(), # - triangle index = material
-        "Pos" = vec( 0, 2, 0 ), # - object position
-        "Ang" = ang( 0, 0, 0 ), # - object angles
-        "Scale" = vec( 1 ), # - object scale
-        "RotatedLocal" = array(), # - for shading
-        "Translated" = array() # - for drawing
-        )]#
-    2 = table(
-        "info" = "cube", # - info about object
-        "Vertices" = array( # - object vertices
-        vec(-0.25, -0.25, -0.25),
-        vec(-0.25, 0.25, -0.25),
-        vec(0.25, 0.25, -0.25),
-        vec(0.25, -0.25, -0.25),
-        
-        vec(-0.25, -0.25, 0.25),
-        vec(-0.25, 0.25, 0.25),
-        vec(0.25, 0.25, 0.25),
-        vec(0.25, -0.25, 0.25)),
-        
-        "Triangles" = array( # - object triangles
-        vec(1, 2, 3),
-        vec(3, 4, 1),
-        
-        vec(8, 7, 6),
-        vec(6, 5, 8),
-        
-        vec(7, 8, 4),
-        vec(4, 3, 7),
-        
-        vec(5, 6, 2),
-        vec(2, 1, 5),
-        
-        vec(6, 7, 3),
-        vec(3, 2, 6),
-        
-        vec(1, 4, 8),
-        vec(8, 5, 1)
+        "Triangles" = array(
+            vec( 1, 2, 3 ),
+            vec( 3, 4, 1 ),
+            
+            vec( 8, 7, 6 ),
+            vec( 6, 5, 8 ),
+            
+            vec( 7, 8, 4 ),
+            vec( 4, 3, 7 ),
+            
+            vec( 5, 6, 2 ),
+            vec( 2, 1, 5 ),
+            
+            vec( 6, 7, 3 ),
+            vec( 3, 2, 6 ),
+            
+            vec( 1, 4, 8 ),
+            vec( 8, 5, 1 )
         ),
-        "UV" = table(), # - triangle index = material
-        "Pos" = vec( 0, 0, 0 ), # - object position
-        "Ang" = ang( 0, 0, 0 ), # - object angles
-        "Scale" = vec( 1 ), # - object scale
-        "RotatedLocal" = array(), # - for shading
-        "Translated" = array() # - for drawing
-        )
-    )
+        "Pos" = vec( 0, 2, 0 ),
+        "Scale" = vec( 0.5 )
+    ) ) )
+    Objects:obj_tbl_set( 1, obj_init( table(
+        "desc" = "Cube",
+        "Vertices" = array(
+            vec( -0.25, -0.25, -0.25 ),
+            vec( -0.25, 0.25, -0.25 ),
+            vec( 0.25, 0.25, -0.25 ),
+            vec( 0.25, -0.25, -0.25 ),
+            
+            vec( -0.25, -0.25, 0.25 ),
+            vec( -0.25, 0.25, 0.25 ),
+            vec( 0.25, 0.25, 0.25 ),
+            vec( 0.25, -0.25, 0.25 )
+        ),
+        "Triangles" = array(
+            vec( 1, 2, 3 ),
+            vec( 3, 4, 1 ),
+            
+            vec( 8, 7, 6 ),
+            vec( 6, 5, 8 ),
+            
+            vec( 7, 8, 4 ),
+            vec( 4, 3, 7 ),
+            
+            vec( 5, 6, 2 ),
+            vec( 2, 1, 5 ),
+            
+            vec( 6, 7, 3 ),
+            vec( 3, 2, 6 ),
+            
+            vec( 1, 4, 8 ),
+            vec( 8, 5, 1 )
+        ),
+        "Scale" = vec( 1 )
+    ) ) )
     
-    foreach( I:number, Obj:table = Objects ) { for( O = 1, Obj:obj_tri():count() ) { Obj["UV", table][O, string] = "vgui/resource/icon_steam" } } # - setting up objects triangles material
+    foreach( I:number, Obj:table = Objects ) { for( O = 1, Obj:obj_tri():count() ) { Obj:obj_uv( O, "vgui/resource/icon_steam" ) } } # - setting up objects triangles material
     
     initialize( table( 
         S, # - egp screen
@@ -107,7 +94,19 @@ if( first() ) {
         1 # - Debug mode( Shows your pos, angles, triangles, visible triangles )
         ) 
     ) # - Render and Scene initialize
-    Render:graphics_update()
+    
+    render_think( 100 ) # - set interval
+    
+    timer( "Think", render_think() )
 }
-Render:graphics_update()
-Render:camera():controls( Memory )
+
+if ( clk( "Think" ) ) {
+    timer( "Think", render_think() )
+    
+    Render:graphics_update()
+    Render:camera():controls( Memory )
+    
+    Objects[ 1, table ]:obj_ang( ang( curtime() * 55 ) )
+    Objects[ 2, table ]:obj_pos( vec( sin( curtime() * 55 ), 0, cos( curtime() * 55 ) ) )
+    Objects[ 2, table ]:obj_ang( ang( 0, curtime() * 99, 0 ) )
+}
