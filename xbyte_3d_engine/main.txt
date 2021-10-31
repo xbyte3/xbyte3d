@@ -11,6 +11,7 @@ function void render_init( T:table ) {
         TriangleCount += Obj["Triangles", array]:count()
     }
     
+    Render[ "think", number ] = 100
     Render["screen", wirelink] = T[1, wirelink]
     Render["camera", table] = table( "cp" = T[2, vector], "ca" = T[3, angle], "fov" = T[4, number], "znear" = T[5, number], "zfar" = T[6, number], "res" = T[7, vector2] )
     Render["objects", table] = T[8, table]
@@ -22,6 +23,8 @@ function void render_init( T:table ) {
     Render["debugmode", number] = T[9, number]
 }
 
+function void render_think( I ) { Render[ "think", number ] = I }
+function number render_think() { return Render[ "think", number ] }
 function wirelink render_screen() { return Render["screen", wirelink] } # - get EGP
 function table render_objects() { return Render["objects", table] } # - get objects
 function table render_camera() { return Render["camera", table] } # - get camera

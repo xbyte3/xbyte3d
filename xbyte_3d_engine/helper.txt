@@ -1,4 +1,34 @@
 
+function void table:obj_tbl_set( I, Object:table ) { This[ I, table ] = Object }
+
+function table obj_init( Data:table ) {
+    return table(
+        "desc" = Data[ "desc", string ], # - description about object
+        "Vertices" = Data[ "Vertices", array ], # - object vertices
+        "Triangles" = Data[ "Triangles", array ], # - object triangles
+        "UV" = Data[ "UV", table ], # - triangle index = material
+        "Pos" = Data[ "Pos", vector ], # - object position
+        "Ang" = Data[ "Ang", angle ], # - object angles
+        "Scale" = Data[ "Scale", vector ], # - object scale
+        "RotatedLocal" = array(), # - for shading
+        "Translated" = array() # - for drawing
+    )
+}
+
+function table obj_init_empty() {
+    return table(
+        "desc" = "", # - description about object
+        "Vertices" = array(), # - object vertices
+        "Triangles" = array(), # - object triangles
+        "UV" = table(), # - triangle index = material
+        "Pos" = vec(), # - object position
+        "Ang" = ang(), # - object angles
+        "Scale" = vec(), # - object scale
+        "RotatedLocal" = array(), # - for shading
+        "Translated" = array() # - for drawing
+    )
+}
+
 function array table:obj_vertices() { return This["Vertices", array] } # - get object vertices
 function array table:obj_tri() { return This["Triangles", array] } # - get object triangles
 function table table:obj_uv() { return This["UV", table] } # - get object triangles materials
@@ -8,6 +38,17 @@ function angle table:obj_ang() { return This["Ang", angle] } # - get object angl
 function vector table:obj_scale() { return This["Scale", vector] }
 function array table:obj_rl() { return This["RotatedLocal", array] } # - get object rotatedlocals
 function array table:obj_tr() { return This["Translated", array] } # - get object translated
+
+function void table:obj_vert( A:table ) { This[ "Vertices", table ] = A }
+function void table:obj_tri( A:table ) { This[ "Triangles", table ] = A }
+function void table:obj_uv( I, A:string ) { This[ "UV", table ][ I, string ] = A }
+function void table:obj_index( A ) { This[ "Index", number ] = A }
+function void table:obj_pos( A:vector ) { This[ "Pos", vector ] = A }
+function void table:obj_ang( A:angle ) { This[ "Ang", angle ] = A }
+function void table:obj_scale( A:vector ) { This[ "Scale", vector ] = A }
+function void table:obj_rl( A:array ) { This[ "RotatedLocal", array ] = A }
+function void table:obj_tr( A:array ) { This[ "Translated", array ] = A }
+
 
 function wirelink table:screen() { return This["screen", wirelink] } # - get screen
 function table table:objects() { return This["objects", table] } # - get objects
