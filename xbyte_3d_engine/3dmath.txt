@@ -9,8 +9,12 @@ function vector vector:invert() {
     return vec( This:x(), This:z(), This:y() )
 }
 
-function vector angle:get_eye() {
-    return vec( cos( This:yaw() ), sin( This:yaw() ), tan( -This:pitch() ) ):normalized()
+function vector angle:vector() {
+    return vec( 
+            cos( This:yaw() ) * cos( This:pitch() ), 
+            sin( This:yaw() ) * cos( This:pitch() ), 
+            sin( -This:pitch() )
+            )
 }
 
 function number number:anormalize() {
@@ -36,11 +40,11 @@ function matrix4 perspective( FOV, Aspect, ZNear, ZFar ) {
     local Left = -Right
     
     return matrix4(
-		( 2 * ZNear ) / ( Right - Left ), 0, 0, 0,
-		0, ( 2 * ZNear ) / ( Top - Bottom ), 0, 0,
-		( Right + Left ) / ( Right - Left ), ( Top + Bottom ) / ( Top - Bottom ), -( ( ZFar + ZNear ) / ( ZFar - ZNear ) ), -1,
-		0, 0, -( ( 2 * ZFar * ZNear ) / ( ZFar - ZNear ) ), 0
-		)
+        		(  2 * ZNear ) / ( Right - Left ), 0, 0, 0,
+        	   0, ( 2 * ZNear ) / ( Top - Bottom ), 0, 0,
+        		( Right + Left ) / ( Right - Left ), ( Top + Bottom ) / ( Top - Bottom ), -( ( ZFar + ZNear ) / ( ZFar - ZNear ) ), -1,
+            0, 0, -( ( 2 * ZFar * ZNear ) / ( ZFar - ZNear ) ), 0
+            )
 }
 
 function matrix4 lookat( [Eye Center Up]:vector ) {
